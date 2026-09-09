@@ -1,0 +1,1238 @@
+do
+    local KEY = "LedZKey"
+    local DISCORD = "https://discord.gg/DYMYt8ezzD"
+
+    local TweenService = game:GetService("TweenService")
+    local UserInputService = game:GetService("UserInputService")
+
+    local keyParent = (gethui and gethui()) or game:GetService("CoreGui")
+
+    for _, old in ipairs(keyParent:GetChildren()) do
+        if old.Name == "LedZKeySystem" then
+            pcall(function()
+                old:Destroy()
+            end)
+        end
+    end
+
+    local keyGui = Instance.new("ScreenGui")
+    keyGui.Name = "LedZKeySystem"
+    keyGui.ResetOnSpawn = false
+    keyGui.IgnoreGuiInset = true
+    keyGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    keyGui.DisplayOrder = 999999
+    keyGui.Parent = keyParent
+
+    local dim = Instance.new("Frame")
+    dim.Size = UDim2.fromScale(1, 1)
+    dim.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    dim.BackgroundTransparency = 1
+    dim.BorderSizePixel = 0
+    dim.Parent = keyGui
+
+    local card = Instance.new("Frame")
+    card.AnchorPoint = Vector2.new(0.5, 0.5)
+    card.Position = UDim2.fromScale(0.5, 0.5)
+    card.Size = UDim2.fromOffset(300, 320)
+    card.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    card.BorderSizePixel = 0
+    card.ClipsDescendants = true
+    card.Parent = keyGui
+
+    local cardCorner = Instance.new("UICorner")
+    cardCorner.CornerRadius = UDim.new(0, 22)
+    cardCorner.Parent = card
+
+    local cardStroke = Instance.new("UIStroke")
+    cardStroke.Color = Color3.fromRGB(255, 255, 255)
+    cardStroke.Thickness = 1
+    cardStroke.Transparency = 0.75
+    cardStroke.Parent = card
+
+    local closeBtn = Instance.new("TextButton")
+    closeBtn.AnchorPoint = Vector2.new(1, 0)
+    closeBtn.Position = UDim2.new(1, -16, 0, 16)
+    closeBtn.Size = UDim2.fromOffset(30, 30)
+    closeBtn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    closeBtn.BackgroundTransparency = 0.9
+    closeBtn.Text = ""
+    closeBtn.AutoButtonColor = false
+    closeBtn.Parent = card
+
+    local closeCorner = Instance.new("UICorner")
+    closeCorner.CornerRadius = UDim.new(1, 0)
+    closeCorner.Parent = closeBtn
+
+    local xa = Instance.new("Frame")
+    xa.AnchorPoint = Vector2.new(0.5, 0.5)
+    xa.Position = UDim2.fromScale(0.5, 0.5)
+    xa.Size = UDim2.fromOffset(13, 2)
+    xa.Rotation = 45
+    xa.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    xa.BorderSizePixel = 0
+    xa.Parent = closeBtn
+
+    local xaCorner = Instance.new("UICorner")
+    xaCorner.CornerRadius = UDim.new(1, 0)
+    xaCorner.Parent = xa
+
+    local xb = Instance.new("Frame")
+    xb.AnchorPoint = Vector2.new(0.5, 0.5)
+    xb.Position = UDim2.fromScale(0.5, 0.5)
+    xb.Size = UDim2.fromOffset(13, 2)
+    xb.Rotation = -45
+    xb.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    xb.BorderSizePixel = 0
+    xb.Parent = closeBtn
+
+    local xbCorner = Instance.new("UICorner")
+    xbCorner.CornerRadius = UDim.new(1, 0)
+    xbCorner.Parent = xb
+
+    local titleLabel = Instance.new("TextLabel")
+    titleLabel.BackgroundTransparency = 1
+    titleLabel.Position = UDim2.new(0, 24, 0, 34)
+    titleLabel.Size = UDim2.new(1, -70, 0, 24)
+    titleLabel.Text = "LedZ Key System"
+    titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    titleLabel.TextSize = 20
+    titleLabel.Font = Enum.Font.GothamBold
+    titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    titleLabel.Parent = card
+
+    local subLabel = Instance.new("TextLabel")
+    subLabel.BackgroundTransparency = 1
+    subLabel.Position = UDim2.new(0, 24, 0, 58)
+    subLabel.Size = UDim2.new(1, -48, 0, 18)
+    subLabel.Text = "Enter your key to continue"
+    subLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
+    subLabel.TextSize = 13
+    subLabel.Font = Enum.Font.Gotham
+    subLabel.TextXAlignment = Enum.TextXAlignment.Left
+    subLabel.Parent = card
+
+    local boxHolder = Instance.new("Frame")
+    boxHolder.Position = UDim2.new(0, 24, 0, 96)
+    boxHolder.Size = UDim2.new(1, -48, 0, 44)
+    boxHolder.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+    boxHolder.BorderSizePixel = 0
+    boxHolder.Parent = card
+
+    local boxCorner = Instance.new("UICorner")
+    boxCorner.CornerRadius = UDim.new(1, 0)
+    boxCorner.Parent = boxHolder
+
+    local boxStroke = Instance.new("UIStroke")
+    boxStroke.Color = Color3.fromRGB(255, 255, 255)
+    boxStroke.Thickness = 1
+    boxStroke.Transparency = 0.7
+    boxStroke.Parent = boxHolder
+
+    local keyBox = Instance.new("TextBox")
+    keyBox.BackgroundTransparency = 1
+    keyBox.Position = UDim2.new(0, 18, 0, 0)
+    keyBox.Size = UDim2.new(1, -36, 1, 0)
+    keyBox.PlaceholderText = "Key"
+    keyBox.PlaceholderColor3 = Color3.fromRGB(110, 110, 110)
+    keyBox.Text = ""
+    keyBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+    keyBox.TextSize = 15
+    keyBox.Font = Enum.Font.GothamMedium
+    keyBox.ClearTextOnFocus = false
+    keyBox.TextXAlignment = Enum.TextXAlignment.Left
+    keyBox.Parent = boxHolder
+
+    local statusLabel = Instance.new("TextLabel")
+    statusLabel.BackgroundTransparency = 1
+    statusLabel.Position = UDim2.new(0, 24, 0, 144)
+    statusLabel.Size = UDim2.new(1, -48, 0, 16)
+    statusLabel.Text = ""
+    statusLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    statusLabel.TextSize = 12
+    statusLabel.Font = Enum.Font.Gotham
+    statusLabel.TextTransparency = 0.35
+    statusLabel.TextXAlignment = Enum.TextXAlignment.Left
+    statusLabel.Parent = card
+
+    local continueBtn = Instance.new("TextButton")
+    continueBtn.Position = UDim2.new(0, 24, 0, 168)
+    continueBtn.Size = UDim2.new(1, -48, 0, 44)
+    continueBtn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    continueBtn.Text = "Continue"
+    continueBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+    continueBtn.TextSize = 15
+    continueBtn.Font = Enum.Font.GothamBold
+    continueBtn.AutoButtonColor = false
+    continueBtn.Parent = card
+
+    local contCorner = Instance.new("UICorner")
+    contCorner.CornerRadius = UDim.new(1, 0)
+    contCorner.Parent = continueBtn
+
+    local dcBtn = Instance.new("TextButton")
+    dcBtn.AnchorPoint = Vector2.new(0.5, 0)
+    dcBtn.Position = UDim2.new(0.5, 0, 0, 228)
+    dcBtn.Size = UDim2.fromOffset(48, 48)
+    dcBtn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    dcBtn.BackgroundTransparency = 0.88
+    dcBtn.Text = ""
+    dcBtn.AutoButtonColor = false
+    dcBtn.Parent = card
+
+    local dcCorner = Instance.new("UICorner")
+    dcCorner.CornerRadius = UDim.new(1, 0)
+    dcCorner.Parent = dcBtn
+
+    local dcStroke = Instance.new("UIStroke")
+    dcStroke.Color = Color3.fromRGB(255, 255, 255)
+    dcStroke.Thickness = 1
+    dcStroke.Transparency = 0.7
+    dcStroke.Parent = dcBtn
+
+    local mark = Instance.new("Frame")
+    mark.AnchorPoint = Vector2.new(0.5, 0.5)
+    mark.Position = UDim2.fromScale(0.5, 0.5)
+    mark.Size = UDim2.fromOffset(28, 24)
+    mark.BackgroundTransparency = 1
+    mark.Parent = dcBtn
+
+    local tailL = Instance.new("Frame")
+    tailL.AnchorPoint = Vector2.new(0.5, 0.5)
+    tailL.Position = UDim2.new(0.5, -9, 0.5, 8)
+    tailL.Size = UDim2.fromOffset(9, 8)
+    tailL.Rotation = 22
+    tailL.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    tailL.BorderSizePixel = 0
+    tailL.ZIndex = 2
+    tailL.Parent = mark
+
+    local tailLCorner = Instance.new("UICorner")
+    tailLCorner.CornerRadius = UDim.new(0, 3)
+    tailLCorner.Parent = tailL
+
+    local tailR = Instance.new("Frame")
+    tailR.AnchorPoint = Vector2.new(0.5, 0.5)
+    tailR.Position = UDim2.new(0.5, 9, 0.5, 8)
+    tailR.Size = UDim2.fromOffset(9, 8)
+    tailR.Rotation = -22
+    tailR.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    tailR.BorderSizePixel = 0
+    tailR.ZIndex = 2
+    tailR.Parent = mark
+
+    local tailRCorner = Instance.new("UICorner")
+    tailRCorner.CornerRadius = UDim.new(0, 3)
+    tailRCorner.Parent = tailR
+
+    local blob = Instance.new("Frame")
+    blob.AnchorPoint = Vector2.new(0.5, 0.5)
+    blob.Position = UDim2.new(0.5, 0, 0.5, -1)
+    blob.Size = UDim2.fromOffset(26, 19)
+    blob.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    blob.BorderSizePixel = 0
+    blob.ZIndex = 3
+    blob.Parent = mark
+
+    local blobCorner = Instance.new("UICorner")
+    blobCorner.CornerRadius = UDim.new(0, 9)
+    blobCorner.Parent = blob
+
+    local eyeL = Instance.new("Frame")
+    eyeL.AnchorPoint = Vector2.new(0.5, 0.5)
+    eyeL.Position = UDim2.new(0.5, -5, 0.5, 0)
+    eyeL.Size = UDim2.fromOffset(5, 7)
+    eyeL.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    eyeL.BorderSizePixel = 0
+    eyeL.ZIndex = 4
+    eyeL.Parent = blob
+
+    local eyeLCorner = Instance.new("UICorner")
+    eyeLCorner.CornerRadius = UDim.new(1, 0)
+    eyeLCorner.Parent = eyeL
+
+    local eyeR = Instance.new("Frame")
+    eyeR.AnchorPoint = Vector2.new(0.5, 0.5)
+    eyeR.Position = UDim2.new(0.5, 5, 0.5, 0)
+    eyeR.Size = UDim2.fromOffset(5, 7)
+    eyeR.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    eyeR.BorderSizePixel = 0
+    eyeR.ZIndex = 4
+    eyeR.Parent = blob
+
+    local eyeRCorner = Instance.new("UICorner")
+    eyeRCorner.CornerRadius = UDim.new(1, 0)
+    eyeRCorner.Parent = eyeR
+
+    local dcLabel = Instance.new("TextLabel")
+    dcLabel.AnchorPoint = Vector2.new(0.5, 0)
+    dcLabel.Position = UDim2.new(0.5, 0, 0, 282)
+    dcLabel.Size = UDim2.new(1, -48, 0, 16)
+    dcLabel.BackgroundTransparency = 1
+    dcLabel.Text = "Get Key"
+    dcLabel.TextColor3 = Color3.fromRGB(160, 160, 160)
+    dcLabel.TextSize = 12
+    dcLabel.Font = Enum.Font.Gotham
+    dcLabel.Parent = card
+
+    card.Size = UDim2.fromOffset(300, 0)
+    card.BackgroundTransparency = 1
+
+    TweenService:Create(
+        dim,
+        TweenInfo.new(0.25),
+        {BackgroundTransparency = 0.45}
+    ):Play()
+
+    TweenService:Create(
+        card,
+        TweenInfo.new(0.35, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
+        {
+            Size = UDim2.fromOffset(300, 320),
+            BackgroundTransparency = 0
+        }
+    ):Play()
+
+    local dragging
+    local dragStart
+    local startPos
+
+    card.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1
+            or input.UserInputType == Enum.UserInputType.Touch then
+
+            dragging = true
+            dragStart = input.Position
+            startPos = card.Position
+
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if dragging and (
+            input.UserInputType == Enum.UserInputType.MouseMovement
+            or input.UserInputType == Enum.UserInputType.Touch
+        ) then
+            local delta = input.Position - dragStart
+            card.Position = UDim2.new(
+                startPos.X.Scale,
+                startPos.X.Offset + delta.X,
+                startPos.Y.Scale,
+                startPos.Y.Offset + delta.Y
+            )
+        end
+    end)
+
+    local result = 0
+
+    local function shake()
+        local base = card.Position
+
+        for i = 1, 6 do
+            card.Position = base + UDim2.fromOffset(
+                (i % 2 == 0) and 7 or -7,
+                0
+            )
+            task.wait(0.03)
+        end
+
+        card.Position = base
+    end
+
+    local function closeKey()
+        TweenService:Create(
+            dim,
+            TweenInfo.new(0.2),
+            {BackgroundTransparency = 1}
+        ):Play()
+
+        local tween = TweenService:Create(
+            card,
+            TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.In),
+            {
+                Size = UDim2.fromOffset(300, 0),
+                BackgroundTransparency = 1
+            }
+        )
+
+        tween:Play()
+        tween.Completed:Wait()
+
+        pcall(function()
+            keyGui:Destroy()
+        end)
+    end
+
+    closeBtn.MouseButton1Click:Connect(function()
+        result = 2
+        task.spawn(closeKey)
+    end)
+
+    dcBtn.MouseButton1Click:Connect(function()
+        TweenService:Create(
+            dcBtn,
+            TweenInfo.new(0.12),
+            {BackgroundTransparency = 0.7}
+        ):Play()
+
+        task.delay(0.15, function()
+            if dcBtn.Parent then
+                TweenService:Create(
+                    dcBtn,
+                    TweenInfo.new(0.15),
+                    {BackgroundTransparency = 0.88}
+                ):Play()
+            end
+        end)
+
+        pcall(function()
+            setclipboard(DISCORD)
+        end)
+
+        pcall(function()
+            local guiService = game:GetService("GuiService")
+            guiService:OpenBrowserWindow(DISCORD)
+        end)
+
+        dcLabel.Text = "Link copied"
+
+        task.delay(2, function()
+            if dcLabel.Parent then
+                dcLabel.Text = "Get Key"
+            end
+        end)
+    end)
+
+    local checking = false
+
+    local function verify()
+        if checking or result ~= 0 then
+            return
+        end
+
+        checking = true
+
+        local entered = keyBox.Text:gsub("%s+", "")
+        continueBtn.Text = "Checking..."
+
+        task.wait(0.4)
+
+        if entered == KEY then
+            continueBtn.Text = "Verified"
+            statusLabel.Text = "Access granted"
+
+            task.wait(0.35)
+
+            result = 1
+            closeKey()
+        else
+            continueBtn.Text = "Continue"
+            statusLabel.Text = "Invalid key"
+            boxStroke.Transparency = 0.2
+
+            task.spawn(shake)
+
+            task.delay(1.6, function()
+                if statusLabel.Parent then
+                    statusLabel.Text = ""
+                    boxStroke.Transparency = 0.7
+                end
+            end)
+
+            checking = false
+        end
+    end
+
+    continueBtn.MouseButton1Click:Connect(function()
+        task.spawn(verify)
+    end)
+
+    keyBox.FocusLost:Connect(function(enterPressed)
+        if enterPressed then
+            task.spawn(verify)
+        end
+    end)
+
+    while result == 0 do
+        if not keyGui.Parent then
+            result = 2
+            break
+        end
+
+        task.wait()
+    end
+
+    if result ~= 1 then
+        pcall(function()
+            keyGui:Destroy()
+        end)
+
+        error("LedZ Key System | cancelled", 0)
+    end
+end
+
+local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
+local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
+
+local Window = Library:CreateWindow({
+    Title = "LedZ dqr",
+    Footer = "v1.5",
+    Icon = "rbxassetid://0",
+    NotifySide = "Right",
+    ShowCustomCursor = true,
+})
+
+local Tabs = {
+    Dungeons = Window:AddTab("dungeons", "sword"),
+    Player = Window:AddTab("Localplayer", "user"),
+}
+
+local lp = game:GetService("Players").LocalPlayer
+local rs = game:GetService("RunService")
+local uis = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local SoundService = game:GetService("SoundService")
+local PathfindingService = game:GetService("PathfindingService")
+
+local farm = false
+local tilt = false
+local attack = false
+local ox, oy, oz = 0, 5, 0
+local lastHit = 0
+local atkDelay = 0.2
+local currentTarget = nil
+
+local farmMethod = "CFrame"
+local farmSpeed = 50
+local currentTween = nil
+
+local orbitEnabled = false
+local orbitRadius = 10
+local orbitSpeed = 50
+local orbitAngle = 0
+local orbitInitialized = false
+
+local autoPath = false
+local pathWaypoints = {}
+local pathIndex = 1
+local pathTarget = nil
+local lastPathCompute = 0
+local pathComputing = false
+local pathRecomputeDelay = 0.5
+
+local noclipConnection = nil
+
+local function isWaveDefense()
+    local music = SoundService:FindFirstChild("Music")
+    if music then
+        return music:FindFirstChild("Wave Defense") ~= nil
+    end
+    return false
+end
+
+local function startNoclip()
+    if noclipConnection then return end
+    noclipConnection = rs.Stepped:Connect(function()
+        local char = lp.Character
+        if not char then return end
+        for _, part in ipairs(char:GetDescendants()) do
+            if part:IsA("BasePart") and part.CanCollide then
+                part.CanCollide = false
+            end
+        end
+    end)
+end
+
+local function stopNoclip()
+    if noclipConnection then
+        noclipConnection:Disconnect()
+        noclipConnection = nil
+    end
+    local char = lp.Character
+    if char then
+        for _, part in ipairs(char:GetDescendants()) do
+            if part:IsA("BasePart") then
+                part.CanCollide = true
+            end
+        end
+    end
+end
+
+local function updateNoclipState()
+    if farm and not autoPath then
+        startNoclip()
+    else
+        stopNoclip()
+    end
+end
+
+local function resetPath()
+    pathWaypoints = {}
+    pathIndex = 1
+    pathTarget = nil
+    lastPathCompute = 0
+end
+
+local function computePath(startPos, endPos)
+    if pathComputing then return end
+    pathComputing = true
+    task.spawn(function()
+        local path = PathfindingService:CreatePath({
+            AgentRadius = 2,
+            AgentHeight = 5,
+            AgentCanJump = true,
+            WaypointSpacing = 4,
+        })
+        local ok = pcall(function()
+            path:ComputeAsync(startPos, endPos)
+        end)
+        if ok and path.Status == Enum.PathStatus.Success then
+            pathWaypoints = path:GetWaypoints()
+            pathIndex = math.min(2, #pathWaypoints)
+        else
+            pathWaypoints = {}
+            pathIndex = 1
+        end
+        lastPathCompute = tick()
+        pathComputing = false
+    end)
+end
+
+local function moveTowards(current, target, maxDistance)
+    local diff = target - current
+    local dist = diff.Magnitude
+    if dist <= maxDistance or dist == 0 then
+        return target
+    end
+    return current + diff.Unit * maxDistance
+end
+
+local farmBox = Tabs.Dungeons:AddLeftGroupbox("autofarm")
+
+farmBox:AddToggle("farm_toggle", {
+    Text = "Auto Farm",
+    Default = false,
+    Callback = function(v)
+        farm = v
+        updateNoclipState()
+        if not v then
+            resetPath()
+        end
+    end
+})
+
+farmBox:AddToggle("tilt_toggle", {
+    Text = "Tilt Character",
+    Default = false,
+    Callback = function(v) tilt = v end
+})
+
+farmBox:AddToggle("atk_toggle", {
+    Text = "Auto Attack",
+    Default = false,
+    Callback = function(v) attack = v end
+})
+
+farmBox:AddInput("x_input", {
+    Default = tostring(ox),
+    Numeric = true,
+    Finished = true,
+    Text = "X Offset",
+    Callback = function(v) ox = tonumber(v) or ox end
+})
+
+farmBox:AddInput("y_input", {
+    Default = tostring(oy),
+    Numeric = true,
+    Finished = true,
+    Text = "Y Offset",
+    Callback = function(v) oy = tonumber(v) or oy end
+})
+
+farmBox:AddInput("z_input", {
+    Default = tostring(oz),
+    Numeric = true,
+    Finished = true,
+    Text = "Z Offset",
+    Callback = function(v) oz = tonumber(v) or oz end
+})
+
+local farmSettingsBox = Tabs.Dungeons:AddLeftGroupbox("Auto Farm Settings")
+
+farmSettingsBox:AddDropdown("farm_method_dropdown", {
+    Values = {"CFrame", "Tween"},
+    Default = "CFrame",
+    Text = "Farm Method",
+    Callback = function(v)
+        farmMethod = v
+        if currentTween then
+            currentTween:Cancel()
+            currentTween = nil
+        end
+        local char = lp.Character
+        local hrp = char and char:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            hrp.AssemblyLinearVelocity = Vector3.zero
+        end
+    end
+})
+
+farmSettingsBox:AddInput("farm_speed_input", {
+    Default = tostring(farmSpeed),
+    Numeric = true,
+    Finished = true,
+    Text = "Farm Speed",
+    Callback = function(v) farmSpeed = tonumber(v) or farmSpeed end
+})
+
+farmSettingsBox:AddToggle("autopath_toggle", {
+    Text = "Auto Path",
+    Default = false,
+    Callback = function(v)
+        autoPath = v
+        resetPath()
+        updateNoclipState()
+    end
+})
+
+farmSettingsBox:AddToggle("orbit_toggle", {
+    Text = "Orbit",
+    Default = false,
+    Callback = function(v)
+        orbitEnabled = v
+        orbitInitialized = false
+        if not v then
+            orbitAngle = 0
+        end
+    end
+})
+
+farmSettingsBox:AddInput("orbit_radius_input", {
+    Default = tostring(orbitRadius),
+    Numeric = true,
+    Finished = true,
+    Text = "Orbit Radius",
+    Callback = function(v) orbitRadius = tonumber(v) or orbitRadius end
+})
+
+farmSettingsBox:AddInput("orbit_speed_input", {
+    Default = tostring(orbitSpeed),
+    Numeric = true,
+    Finished = true,
+    Text = "Orbit Speed",
+    Callback = function(v) orbitSpeed = tonumber(v) or orbitSpeed end
+})
+
+local abilityBox = Tabs.Dungeons:AddLeftGroupbox("abilites")
+
+local autoAbility = false
+local abilityCooldown = 0.5
+local lastAbilityFire = {}
+
+abilityBox:AddToggle("ability_toggle", {
+    Text = "Auto Use Ability",
+    Default = false,
+    Callback = function(v) autoAbility = v end
+})
+
+abilityBox:AddInput("ability_cooldown_input", {
+    Default = tostring(abilityCooldown),
+    Numeric = true,
+    Finished = true,
+    Text = "Ability Cooldown",
+    Callback = function(v) abilityCooldown = tonumber(v) or abilityCooldown end
+})
+
+local statusBox = Tabs.Dungeons:AddRightGroupbox("status")
+
+local aliveLabel = statusBox:AddLabel("Enemies Alive: 0")
+local targetLabel = statusBox:AddLabel("Targeting: None")
+
+local function aliveEnemy(e)
+    local h = e:FindFirstChild("Humanoid")
+    return h and h.Health > 0
+end
+
+local function enemyRoot(e)
+    return e:FindFirstChild("HumanoidRootPart") or e:FindFirstChild("UpperTorso") or e:FindFirstChild("Torso")
+end
+
+local function countAlive()
+    if isWaveDefense() then
+        local enemies = workspace:FindFirstChild("enemies")
+        if not enemies then return 0 end
+        local count = 0
+        for _, e in ipairs(enemies:GetChildren()) do
+            if aliveEnemy(e) then count += 1 end
+        end
+        return count
+    end
+
+    local dungeon = workspace:FindFirstChild("dungeon")
+    if not dungeon then return 0 end
+    local count = 0
+    for _, room in ipairs(dungeon:GetChildren()) do
+        local ef = room:FindFirstChild("enemyFolder")
+        if ef then
+            for _, e in ipairs(ef:GetChildren()) do
+                if aliveEnemy(e) then count += 1 end
+            end
+        end
+    end
+    return count
+end
+
+local function getTarget(hrp)
+    if isWaveDefense() then
+        local enemies = workspace:FindFirstChild("enemies")
+        if not enemies then return end
+        local bestE, bestD
+        for _, e in ipairs(enemies:GetChildren()) do
+            if aliveEnemy(e) then
+                local root = enemyRoot(e)
+                if root then
+                    local d = (root.Position - hrp.Position).Magnitude
+                    if not bestD or d < bestD then
+                        bestD = d
+                        bestE = e
+                    end
+                end
+            end
+        end
+        return bestE
+    end
+
+    local dungeon = workspace:FindFirstChild("dungeon")
+    if not dungeon then return end
+
+    local bestRoom, bestRoomDist
+    for _, room in ipairs(dungeon:GetChildren()) do
+        local ef = room:FindFirstChild("enemyFolder")
+        if ef then
+            local nearestInRoom
+            for _, e in ipairs(ef:GetChildren()) do
+                if aliveEnemy(e) then
+                    local root = enemyRoot(e)
+                    if root then
+                        local d = (root.Position - hrp.Position).Magnitude
+                        if not nearestInRoom or d < nearestInRoom then
+                            nearestInRoom = d
+                        end
+                    end
+                end
+            end
+            if nearestInRoom and (not bestRoomDist or nearestInRoom < bestRoomDist) then
+                bestRoomDist = nearestInRoom
+                bestRoom = room
+            end
+        end
+    end
+    if not bestRoom then return end
+
+    local ef = bestRoom.enemyFolder
+    local bestE, bestD
+    for _, e in ipairs(ef:GetChildren()) do
+        if aliveEnemy(e) then
+            local root = enemyRoot(e)
+            if root then
+                local d = (root.Position - hrp.Position).Magnitude
+                if not bestD or d < bestD then
+                    bestD = d
+                    bestE = e
+                end
+            end
+        end
+    end
+    return bestE
+end
+
+local function findFireEvent(tool)
+    local direct = tool:FindFirstChildOfClass("RemoteEvent")
+    if direct then return direct end
+
+    for _, desc in ipairs(tool:GetDescendants()) do
+        if desc:IsA("RemoteEvent") then
+            return desc
+        end
+    end
+
+    return nil
+end
+
+local function fireAbilities()
+    local backpack = lp:FindFirstChild("Backpack")
+    if not backpack then return end
+
+    for _, tool in ipairs(backpack:GetChildren()) do
+        if tool:IsA("Tool") then
+            local last = lastAbilityFire[tool] or 0
+            if tick() - last >= abilityCooldown then
+                local event = findFireEvent(tool)
+                if event then
+                    event:FireServer()
+                    lastAbilityFire[tool] = tick()
+                end
+            end
+        end
+    end
+end
+
+rs.Heartbeat:Connect(function(dt)
+    aliveLabel:SetText("Enemies Alive: " .. countAlive())
+
+    if not farm then
+        currentTarget = nil
+        targetLabel:SetText("Targeting: None")
+        if currentTween then
+            currentTween:Cancel()
+            currentTween = nil
+        end
+        orbitInitialized = false
+        return
+    end
+
+    local char = lp.Character
+    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+
+    local target = getTarget(hrp)
+    currentTarget = target
+    targetLabel:SetText("Targeting: " .. (target and target.Name or "None"))
+
+    if autoAbility then
+        fireAbilities()
+    end
+
+    if not target then
+        if currentTween then
+            currentTween:Cancel()
+            currentTween = nil
+        end
+        orbitInitialized = false
+        resetPath()
+        return
+    end
+
+    local root = enemyRoot(target)
+    if not root then return end
+
+    local torso = target:FindFirstChild("UpperTorso") or target:FindFirstChild("Torso") or root
+
+    local pos
+    if orbitEnabled then
+        if not orbitInitialized then
+            local rel = hrp.Position - root.Position
+            orbitAngle = math.deg(math.atan2(rel.Z, rel.X))
+            orbitInitialized = true
+        end
+        orbitAngle = orbitAngle + orbitSpeed * dt
+        local angleRad = math.rad(orbitAngle)
+        local offset = Vector3.new(math.cos(angleRad) * orbitRadius, oy, math.sin(angleRad) * orbitRadius)
+        pos = root.Position + offset
+    else
+        orbitInitialized = false
+        pos = root.Position + Vector3.new(ox, oy, oz)
+    end
+
+    if autoPath then
+        local closeDist = orbitEnabled and (orbitRadius + 4) or 8
+        local distToTarget = (hrp.Position - root.Position).Magnitude
+
+        if distToTarget > closeDist then
+            if pathTarget ~= target then
+                pathTarget = target
+                pathWaypoints = {}
+                pathIndex = 1
+                computePath(hrp.Position, root.Position)
+            elseif tick() - lastPathCompute >= pathRecomputeDelay then
+                computePath(hrp.Position, root.Position)
+            end
+
+            local wp = pathWaypoints[pathIndex]
+            if wp then
+                local flatHrp = Vector3.new(hrp.Position.X, 0, hrp.Position.Z)
+                local flatWp = Vector3.new(wp.Position.X, 0, wp.Position.Z)
+                if (flatHrp - flatWp).Magnitude < 2 and pathIndex < #pathWaypoints then
+                    pathIndex += 1
+                    wp = pathWaypoints[pathIndex]
+                end
+            end
+            if wp then
+                pos = wp.Position + Vector3.new(0, 3, 0)
+            end
+        else
+            pathWaypoints = {}
+            pathIndex = 1
+        end
+    end
+
+    local maxDist = math.max(farmSpeed, 0) * dt
+    local newPos = moveTowards(hrp.Position, pos, maxDist)
+
+    local newCFrame
+    if orbitEnabled then
+        newCFrame = CFrame.new(newPos, torso.Position)
+    elseif tilt then
+        newCFrame = CFrame.new(newPos, torso.Position)
+    else
+        newCFrame = CFrame.new(newPos)
+    end
+
+    if farmMethod == "CFrame" then
+        if currentTween then
+            currentTween:Cancel()
+            currentTween = nil
+        end
+        hrp.CFrame = newCFrame
+        hrp.AssemblyLinearVelocity = Vector3.zero
+        hrp.AssemblyAngularVelocity = Vector3.zero
+
+    elseif farmMethod == "Tween" then
+        if currentTween then
+            currentTween:Cancel()
+        end
+        currentTween = TweenService:Create(hrp, TweenInfo.new(dt, Enum.EasingStyle.Linear), {CFrame = newCFrame})
+        currentTween:Play()
+        hrp.AssemblyLinearVelocity = Vector3.zero
+        hrp.AssemblyAngularVelocity = Vector3.zero
+    end
+
+    if attack and tick() - lastHit >= atkDelay then
+        local weaponVal = lp:FindFirstChild("weaponEquipped")
+        local swordName = weaponVal and weaponVal.Value
+        local tool = swordName and char:FindFirstChild(swordName)
+        local ev = tool and tool:FindFirstChild("swing")
+        if ev then
+            ev:FireServer()
+            lastHit = tick()
+        end
+    end
+end)
+
+local playerBox = Tabs.Player:AddLeftGroupbox("player")
+
+local speedOn = false
+local speedVal = 16
+local speedType = "WalkSpeed"
+
+local jumpOn = false
+local jumpVal = 50
+
+local hipOn = false
+local hipVal = 2
+
+local flying = false
+local flySpeed = 50
+local bodyVelocity = nil
+local bodyGyro = nil
+
+local defaultWalkSpeed = 16
+local defaultJumpPower = 50
+local defaultHipHeight = 2
+
+local function captureDefaults(char)
+    local hum = char:WaitForChild("Humanoid", 5)
+    if hum then
+        defaultWalkSpeed = hum.WalkSpeed
+        defaultJumpPower = hum.JumpPower
+        defaultHipHeight = hum.HipHeight
+    end
+end
+
+if lp.Character then captureDefaults(lp.Character) end
+lp.CharacterAdded:Connect(captureDefaults)
+
+playerBox:AddToggle("speed_toggle", {
+    Text = "Speed",
+    Default = false,
+    Callback = function(v)
+        speedOn = v
+        if not v then
+            local char = lp.Character
+            local hum = char and char:FindFirstChild("Humanoid")
+            if hum then hum.WalkSpeed = defaultWalkSpeed end
+        end
+    end
+})
+
+playerBox:AddInput("speed_input", {
+    Default = tostring(speedVal),
+    Numeric = true,
+    Finished = true,
+    Text = "Speed Value",
+    Callback = function(v) speedVal = tonumber(v) or speedVal end
+})
+
+playerBox:AddDropdown("speed_type", {
+    Values = {"WalkSpeed", "Velocity", "CFrame"},
+    Default = "WalkSpeed",
+    Text = "Speed Type",
+    Callback = function(v) speedType = v end
+})
+
+playerBox:AddToggle("jump_toggle", {
+    Text = "Jump Power",
+    Default = false,
+    Callback = function(v)
+        jumpOn = v
+        if not v then
+            local char = lp.Character
+            local hum = char and char:FindFirstChild("Humanoid")
+            if hum then hum.JumpPower = defaultJumpPower end
+        end
+    end
+})
+
+playerBox:AddInput("jump_input", {
+    Default = tostring(jumpVal),
+    Numeric = true,
+    Finished = true,
+    Text = "Jump Power Value",
+    Callback = function(v) jumpVal = tonumber(v) or jumpVal end
+})
+
+playerBox:AddToggle("hip_toggle", {
+    Text = "Hip Height",
+    Default = false,
+    Callback = function(v)
+        hipOn = v
+        if not v then
+            local char = lp.Character
+            local hum = char and char:FindFirstChild("Humanoid")
+            if hum then hum.HipHeight = defaultHipHeight end
+        end
+    end
+})
+
+playerBox:AddInput("hip_input", {
+    Default = tostring(hipVal),
+    Numeric = true,
+    Finished = true,
+    Text = "Hip Height Value",
+    Callback = function(v) hipVal = tonumber(v) or hipVal end
+})
+
+local function stopFlying()
+    flying = false
+    local char = lp.Character
+    local hum = char and char:FindFirstChild("Humanoid")
+    if hum then hum.PlatformStand = false end
+    if bodyVelocity then bodyVelocity:Destroy() bodyVelocity = nil end
+    if bodyGyro then bodyGyro:Destroy() bodyGyro = nil end
+end
+
+local function startFlying()
+    local char = lp.Character
+    local hum = char and char:FindFirstChild("Humanoid")
+    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+    if not hum or not hrp then return end
+    flying = true
+    hum.PlatformStand = true
+
+    bodyVelocity = Instance.new("BodyVelocity")
+    bodyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+    bodyVelocity.Velocity = Vector3.new(0, 0, 0)
+    bodyVelocity.Parent = hrp
+
+    bodyGyro = Instance.new("BodyGyro")
+    bodyGyro.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
+    bodyGyro.P = 12500
+    bodyGyro.Parent = hrp
+end
+
+playerBox:AddToggle("fly_toggle", {
+    Text = "Fly",
+    Default = false,
+    Callback = function(v)
+        if v then
+            startFlying()
+        else
+            stopFlying()
+        end
+    end
+})
+
+playerBox:AddInput("fly_input", {
+    Default = tostring(flySpeed),
+    Numeric = true,
+    Finished = true,
+    Text = "Fly Speed",
+    Callback = function(v) flySpeed = tonumber(v) or flySpeed end
+})
+
+rs.Heartbeat:Connect(function(dt)
+    local char = lp.Character
+    local hum = char and char:FindFirstChild("Humanoid")
+    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+    if not hum or not hrp then return end
+
+    if speedOn then
+        if speedType == "WalkSpeed" then
+            hum.WalkSpeed = speedVal
+        elseif speedType == "Velocity" then
+            local move = hum.MoveDirection
+            if move.Magnitude > 0 then
+                local vel = move.Unit * speedVal
+                hrp.AssemblyLinearVelocity = Vector3.new(vel.X, hrp.AssemblyLinearVelocity.Y, vel.Z)
+            end
+        elseif speedType == "CFrame" then
+            local move = hum.MoveDirection
+            if move.Magnitude > 0 then
+                hrp.CFrame = hrp.CFrame + move.Unit * speedVal * dt
+            end
+        end
+    end
+
+    if jumpOn then
+        hum.JumpPower = jumpVal
+    end
+
+    if hipOn then
+        hum.HipHeight = hipVal
+    end
+end)
+
+lp.CharacterAdded:Connect(function(newChar)
+    task.wait(0.5)
+    if flying then
+        stopFlying()
+    end
+end)
+
+rs.RenderStepped:Connect(function()
+    if not flying or not bodyVelocity or not bodyGyro then return end
+
+    local camera = workspace.CurrentCamera
+    local move = Vector3.new(0, 0, 0)
+
+    if uis:IsKeyDown(Enum.KeyCode.W) then move += camera.CFrame.LookVector end
+    if uis:IsKeyDown(Enum.KeyCode.S) then move -= camera.CFrame.LookVector end
+    if uis:IsKeyDown(Enum.KeyCode.A) then move -= camera.CFrame.RightVector end
+    if uis:IsKeyDown(Enum.KeyCode.D) then move += camera.CFrame.RightVector end
+    if uis:IsKeyDown(Enum.KeyCode.Space) then move += Vector3.new(0, 1, 0) end
+    if uis:IsKeyDown(Enum.KeyCode.LeftControl) then move -= Vector3.new(0, 1, 0) end
+
+    pcall(function()
+        local ps = lp:FindFirstChild("PlayerScripts")
+        if ps then
+            local pm = ps:FindFirstChild("PlayerModule")
+            if pm then
+                local cm = require(pm:WaitForChild("ControlModule"))
+                local mv = cm:GetMoveVector()
+                move += camera.CFrame.LookVector * -mv.Z
+                move += camera.CFrame.RightVector * mv.X
+            end
+        end
+    end)
+
+    if move.Magnitude > 0 then
+        move = move.Unit * flySpeed
+    end
+
+    bodyVelocity.Velocity = move
+    bodyGyro.CFrame = camera.CFrame
+end)
