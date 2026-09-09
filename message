@@ -495,7 +495,6 @@ local lp = game:GetService("Players").LocalPlayer
 local rs = game:GetService("RunService")
 local uis = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
-local SoundService = game:GetService("SoundService")
 local PathfindingService = game:GetService("PathfindingService")
 
 local farm = false
@@ -526,12 +525,19 @@ local pathRecomputeDelay = 0.5
 
 local noclipConnection = nil
 
-local function isWaveDefense()
-    local music = SoundService:FindFirstChild("Music")
-    if music then
-        return music:FindFirstChild("Wave Defense") ~= nil
+local function isDungeonMap()
+    local dungeon = workspace:FindFirstChild("dungeon")
+    if not dungeon then
+        return false
     end
-    return false
+
+    for _, child in ipairs(dungeon:GetChildren()) do
+        if child.Name:lower():match("^room") then
+            return true
+        end
+    end
+
+    return #dungeon:GetChildren() > 0
 end
 
 local function startNoclip()
@@ -762,36 +768,62 @@ local function enemyRoot(e)
 end
 
 local function countAlive()
-    if isWaveDefense() then
-        local enemies = workspace:FindFirstChild("enemies")
-        if not enemies then return 0 end
+    if isDungeonMap() then
+        local dungeon = workspace:FindFirstChild("dungeon")
+        if not dungeon then return 0 end
         local count = 0
-        for _, e in ipairs(enemies:GetChildren()) do
-            if aliveEnemy(e) then count += 1 end
+        for _, room in ipairs(dungeon:GetChildren()) do
+            local ef = room:FindFirstChild("enemyFolder")
+            if ef then
+                for _, e in ipairs(ef:GetChildren()) do
+                    if aliveEnemy(e) then count += 1 end
+                end
+            end
         end
         return count
     end
 
-    local dungeon = workspace:FindFirstChild("dungeon")
-    if not dungeon then return 0 end
+    local enemies = workspace:FindFirstChild("enemies")
+    if not enemies then return 0 end
     local count = 0
-    for _, room in ipairs(dungeon:GetChildren()) do
-        local ef = room:FindFirstChild("enemyFolder")
-        if ef then
-            for _, e in ipairs(ef:GetChildren()) do
-                if aliveEnemy(e) then count += 1 end
-            end
-        end
+    for _, e in ipairs(enemies:GetChildren()) do
+        if aliveEnemy(e) then count += 1 end
     end
     return count
 end
 
 local function getTarget(hrp)
-    if isWaveDefense() then
-        local enemies = workspace:FindFirstChild("enemies")
-        if not enemies then return end
+    if isDungeonMap() then
+        local dungeon = workspace:FindFirstChild("dungeon")
+        if not dungeon then return end
+
+        local bestRoom, bestRoomDist
+        for _, room in ipairs(dungeon:GetChildren()) do
+            local ef = room:FindFirstChild("enemyFolder")
+            if ef then
+                local nearestInRoom
+                for _, e in ipairs(ef:GetChildren()) do
+                    if aliveEnemy(e) then
+                        local root = enemyRoot(e)
+                        if root then
+                            local d = (root.Position - hrp.Position).Magnitude
+                            if not nearestInRoom or d < nearestInRoom then
+                                nearestInRoom = d
+                            end
+                        end
+                    end
+                end
+                if nearestInRoom and (not bestRoomDist or nearestInRoom < bestRoomDist) then
+                    bestRoomDist = nearestInRoom
+                    bestRoom = room
+                end
+            end
+        end
+        if not bestRoom then return end
+
+        local ef = bestRoom.enemyFolder
         local bestE, bestD
-        for _, e in ipairs(enemies:GetChildren()) do
+        for _, e in ipairs(ef:GetChildren()) do
             if aliveEnemy(e) then
                 local root = enemyRoot(e)
                 if root then
@@ -806,36 +838,10 @@ local function getTarget(hrp)
         return bestE
     end
 
-    local dungeon = workspace:FindFirstChild("dungeon")
-    if not dungeon then return end
-
-    local bestRoom, bestRoomDist
-    for _, room in ipairs(dungeon:GetChildren()) do
-        local ef = room:FindFirstChild("enemyFolder")
-        if ef then
-            local nearestInRoom
-            for _, e in ipairs(ef:GetChildren()) do
-                if aliveEnemy(e) then
-                    local root = enemyRoot(e)
-                    if root then
-                        local d = (root.Position - hrp.Position).Magnitude
-                        if not nearestInRoom or d < nearestInRoom then
-                            nearestInRoom = d
-                        end
-                    end
-                end
-            end
-            if nearestInRoom and (not bestRoomDist or nearestInRoom < bestRoomDist) then
-                bestRoomDist = nearestInRoom
-                bestRoom = room
-            end
-        end
-    end
-    if not bestRoom then return end
-
-    local ef = bestRoom.enemyFolder
+    local enemies = workspace:FindFirstChild("enemies")
+    if not enemies then return end
     local bestE, bestD
-    for _, e in ipairs(ef:GetChildren()) do
+    for _, e in ipairs(enemies:GetChildren()) do
         if aliveEnemy(e) then
             local root = enemyRoot(e)
             if root then
