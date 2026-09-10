@@ -624,9 +624,11 @@ end
 local function getGroundY(position, ignoreInstance)
     local rayParams = RaycastParams.new()
     rayParams.FilterType = Enum.RaycastFilterType.Exclude
-    if ignoreInstance then
-        rayParams.FilterDescendantsInstances = {ignoreInstance}
-    end
+    
+    local filter = {}
+    if ignoreInstance then table.insert(filter, ignoreInstance) end
+    if lp.Character then table.insert(filter, lp.Character) end
+    rayParams.FilterDescendantsInstances = filter
 
     local rayResult = workspace:Raycast(position, Vector3.new(0, -1000, 0), rayParams)
 
@@ -1060,10 +1062,10 @@ rs.Heartbeat:Connect(function(dt)
     local root = enemyRoot(target)
     if not root then return end
 
-    -- Get true ground level under the enemy (fixes tall/big bosses causing
-    -- constant upward tweening, since root.Position can be far above the floor)
-    local groundY = getGroundY(root.Position, target)
+    local head = target:FindFirstChild("Head") or target:FindFirstChild("head")
+    local headY = head and head.Position.Y or (root.Position.Y + 3)
 
+    local groundY = getGroundY(root.Position, target)
     local distanceToTarget = horizontalDistance(hrp.Position, root.Position)
 
     if autoAbility then
@@ -1082,10 +1084,10 @@ rs.Heartbeat:Connect(function(dt)
         orbitAngle = orbitAngle + orbitSpeed * dt
         local angleRad = math.rad(orbitAngle)
         local offset = Vector3.new(math.cos(angleRad) * orbitRadius, 0, math.sin(angleRad) * orbitRadius)
-        pos = Vector3.new(root.Position.X, groundY + oy, root.Position.Z) + offset
+        pos = Vector3.new(root.Position.X, headY + oy, root.Position.Z) + offset
     else
         orbitInitialized = false
-        pos = Vector3.new(root.Position.X + ox, groundY + oy, root.Position.Z + oz)
+        pos = Vector3.new(root.Position.X + ox, headY + oy, root.Position.Z + oz)
     end
 
     if autoPath then
@@ -1123,9 +1125,10 @@ rs.Heartbeat:Connect(function(dt)
     local newPos = moveTowards(hrp.Position, pos, maxDist)
 
     local newCFrame
-    if orbitEnabled then
-        newCFrame = CFrame.new(newPos, torso.Position)
-    elseif tilt then
+    if tilt then
+        -- Snaps directly and applies a -50 degree pitch tilt toward the target
+        newCFrame = CFrame.new(newPos, torso.Position) * CFrame.Angles(math.rad(-50), 0, 0)
+    elseif orbitEnabled then
         newCFrame = CFrame.new(newPos, torso.Position)
     else
         newCFrame = CFrame.new(newPos)
