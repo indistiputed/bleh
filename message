@@ -617,6 +617,26 @@ local function moveTowards(current, target, maxDistance)
     return current + diff.Unit * maxDistance
 end
 
+local function horizontalDistance(a, b)
+    return (Vector3.new(a.X, 0, a.Z) - Vector3.new(b.X, 0, b.Z)).Magnitude
+end
+
+local function getGroundY(position, ignoreInstance)
+    local rayParams = RaycastParams.new()
+    rayParams.FilterType = Enum.RaycastFilterType.Exclude
+    if ignoreInstance then
+        rayParams.FilterDescendantsInstances = {ignoreInstance}
+    end
+
+    local rayResult = workspace:Raycast(position, Vector3.new(0, -1000, 0), rayParams)
+
+    if rayResult then
+        return rayResult.Position.Y
+    end
+
+    return position.Y
+end
+
 local farmBox = Tabs.Dungeons:AddLeftGroupbox("autofarm")
 
 farmBox:AddToggle("farm_toggle", {
@@ -1040,7 +1060,11 @@ rs.Heartbeat:Connect(function(dt)
     local root = enemyRoot(target)
     if not root then return end
 
-    local distanceToTarget = (hrp.Position - root.Position).Magnitude
+    -- Get true ground level under the enemy (fixes tall/big bosses causing
+    -- constant upward tweening, since root.Position can be far above the floor)
+    local groundY = getGroundY(root.Position, target)
+
+    local distanceToTarget = horizontalDistance(hrp.Position, root.Position)
 
     if autoAbility then
         fireAbilities(distanceToTarget)
@@ -1057,25 +1081,24 @@ rs.Heartbeat:Connect(function(dt)
         end
         orbitAngle = orbitAngle + orbitSpeed * dt
         local angleRad = math.rad(orbitAngle)
-        local offset = Vector3.new(math.cos(angleRad) * orbitRadius, oy, math.sin(angleRad) * orbitRadius)
-        pos = root.Position + offset
+        local offset = Vector3.new(math.cos(angleRad) * orbitRadius, 0, math.sin(angleRad) * orbitRadius)
+        pos = Vector3.new(root.Position.X, groundY + oy, root.Position.Z) + offset
     else
         orbitInitialized = false
-        pos = root.Position + Vector3.new(ox, oy, oz)
+        pos = Vector3.new(root.Position.X + ox, groundY + oy, root.Position.Z + oz)
     end
 
     if autoPath then
         local closeDist = orbitEnabled and (orbitRadius + 4) or 8
-        local distToTarget = (hrp.Position - root.Position).Magnitude
 
-        if distToTarget > closeDist then
+        if distanceToTarget > closeDist then
             if pathTarget ~= target then
                 pathTarget = target
                 pathWaypoints = {}
                 pathIndex = 1
-                computePath(hrp.Position, root.Position)
+                computePath(hrp.Position, Vector3.new(root.Position.X, groundY, root.Position.Z))
             elseif tick() - lastPathCompute >= pathRecomputeDelay then
-                computePath(hrp.Position, root.Position)
+                computePath(hrp.Position, Vector3.new(root.Position.X, groundY, root.Position.Z))
             end
 
             local wp = pathWaypoints[pathIndex]
