@@ -736,8 +736,48 @@ farmSettingsBox:AddInput("orbit_speed_input", {
 local abilityBox = Tabs.Dungeons:AddLeftGroupbox("abilites")
 
 local autoAbility = false
-local abilityCooldown = 0.5
+local skill1Delay = 1
+local skill2Delay = 3
+local abilityRange = 15
+local selectedAbilities = {}
 local lastAbilityFire = {}
+local abilityToolMap = {}
+
+local function getBackpackAbilityLabels()
+    local labels = {}
+    local nameCounts = {}
+    abilityToolMap = {}
+
+    local function addTool(tool)
+        if not tool:IsA("Tool") then return end
+
+        nameCounts[tool.Name] = (nameCounts[tool.Name] or 0) + 1
+
+        local label = tool.Name
+        if nameCounts[tool.Name] > 1 then
+            label = tool.Name .. " (" .. nameCounts[tool.Name] .. ")"
+        end
+
+        table.insert(labels, label)
+        abilityToolMap[label] = tool
+    end
+
+    local backpack = lp:FindFirstChild("Backpack")
+    if backpack then
+        for _, tool in ipairs(backpack:GetChildren()) do
+            addTool(tool)
+        end
+    end
+
+    local char = lp.Character
+    if char then
+        for _, tool in ipairs(char:GetChildren()) do
+            addTool(tool)
+        end
+    end
+
+    return labels
+end
 
 abilityBox:AddToggle("ability_toggle", {
     Text = "Auto Use Ability",
@@ -745,12 +785,83 @@ abilityBox:AddToggle("ability_toggle", {
     Callback = function(v) autoAbility = v end
 })
 
-abilityBox:AddInput("ability_cooldown_input", {
-    Default = tostring(abilityCooldown),
+local AbilityDropdown = abilityBox:AddDropdown("ability_dropdown", {
+    Values = getBackpackAbilityLabels(),
+    Multi = true,
+    Default = {},
+    Text = "Select 2 Abilities",
+    Callback = function(selected)
+        local newSet = {}
+
+        if typeof(selected) == "table" then
+            if selected[1] ~= nil then
+                for _, label in ipairs(selected) do
+                    newSet[label] = true
+                end
+            else
+                for label, isSelected in pairs(selected) do
+                    if isSelected then
+                        newSet[label] = true
+                    end
+                end
+            end
+        end
+
+        for i = #selectedAbilities, 1, -1 do
+            local label = selectedAbilities[i]
+            if not newSet[label] then
+                table.remove(selectedAbilities, i)
+            else
+                newSet[label] = nil
+            end
+        end
+
+        for label in pairs(newSet) do
+            table.insert(selectedAbilities, label)
+        end
+    end
+})
+
+abilityBox:AddButton({
+    Text = "Refresh Ability List",
+    Func = function()
+        local labels = getBackpackAbilityLabels()
+
+        for i = #selectedAbilities, 1, -1 do
+            if not table.find(labels, selectedAbilities[i]) then
+                table.remove(selectedAbilities, i)
+            end
+        end
+
+        pcall(function()
+            AbilityDropdown:SetValues(labels)
+        end)
+    end
+})
+
+abilityBox:AddSlider("ability_range_slider", {
+    Text = "Ability Use Range (Studs)",
+    Default = 15,
+    Min = 1,
+    Max = 100,
+    Rounding = 0,
+    Callback = function(v) abilityRange = v end
+})
+
+abilityBox:AddInput("skill1_delay_input", {
+    Default = tostring(skill1Delay),
     Numeric = true,
     Finished = true,
-    Text = "Ability Cooldown",
-    Callback = function(v) abilityCooldown = tonumber(v) or abilityCooldown end
+    Text = "Skill 1 Delay (1st Selected)",
+    Callback = function(v) skill1Delay = tonumber(v) or skill1Delay end
+})
+
+abilityBox:AddInput("skill2_delay_input", {
+    Default = tostring(skill2Delay),
+    Numeric = true,
+    Finished = true,
+    Text = "Skill 2 Delay (2nd Selected)",
+    Callback = function(v) skill2Delay = tonumber(v) or skill2Delay end
 })
 
 local statusBox = Tabs.Dungeons:AddRightGroupbox("status")
@@ -869,14 +980,21 @@ local function findFireEvent(tool)
     return nil
 end
 
-local function fireAbilities()
-    local backpack = lp:FindFirstChild("Backpack")
-    if not backpack then return end
+local function fireAbilities(distanceToTarget)
+    if #selectedAbilities ~= 2 then
+        return
+    end
 
-    for _, tool in ipairs(backpack:GetChildren()) do
-        if tool:IsA("Tool") then
+    if not distanceToTarget or distanceToTarget > abilityRange then
+        return
+    end
+
+    for i, label in ipairs(selectedAbilities) do
+        local tool = abilityToolMap[label]
+        if tool and tool.Parent then
+            local delay = (i == 1) and skill1Delay or skill2Delay
             local last = lastAbilityFire[tool] or 0
-            if tick() - last >= abilityCooldown then
+            if tick() - last >= delay then
                 local event = findFireEvent(tool)
                 if event then
                     event:FireServer()
@@ -909,10 +1027,6 @@ rs.Heartbeat:Connect(function(dt)
     currentTarget = target
     targetLabel:SetText("Targeting: " .. (target and target.Name or "None"))
 
-    if autoAbility then
-        fireAbilities()
-    end
-
     if not target then
         if currentTween then
             currentTween:Cancel()
@@ -925,6 +1039,12 @@ rs.Heartbeat:Connect(function(dt)
 
     local root = enemyRoot(target)
     if not root then return end
+
+    local distanceToTarget = (hrp.Position - root.Position).Magnitude
+
+    if autoAbility then
+        fireAbilities(distanceToTarget)
+    end
 
     local torso = target:FindFirstChild("UpperTorso") or target:FindFirstChild("Torso") or root
 
